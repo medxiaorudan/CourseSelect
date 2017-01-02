@@ -42,7 +42,17 @@ class CoursesController < ApplicationController
     flash={:success => "成功删除课程: #{@course.name}"}
     redirect_to courses_path, flash: flash
   end
-
+  def open 
+    @course = Course.find_by_id(params[:id])
+    @course.update_attributes(:open=>true)
+    redirect_to courses_path, flash: {:success => "已经成功开放该课程:#{ @course.name}"}
+  end 
+ 
+  def close
+    @course = Course.find_by_id(params[:id])
+    @course.update_attributes(:open=>false) 
+    redirect_to courses_path, flash: {:success => "已经成功关闭该课程:#{ @course.name}"} 
+  end
   #-------------------------for students----------------------
 def open  
     @course = Course.find_by_id(params[:id]) 
@@ -58,13 +68,15 @@ end
 
   def list
      #   按照关键词（课程名称、教师名）或者下拉列表进行查询
-    @course = Course.all
-    @course_true=Array.new 
-    @course.each do |every_course| 
-      if every_course.open_close then 
-         @course_true.push every_course 
-      end 
-    end  
+    @course=Course.all
+    @course=@course-current_user.courses
+    @course_true=Array.new
+    @course.each do |every_course|
+      if every_course.open_close then
+         @course_true.push every_course
+      end
+    end 
+    @course=@course_true
     @course=@course_true 
     @param1 =  params[:queryKeyword_1]   #课程名
     @param2= params[:queryKeyword_2]  #department
@@ -79,10 +91,10 @@ end
     end
     if @param3.nil? == false and @param3 != ''
       @course = @course.where("credit like '#{@param3}'")
-        end
+    end
     if @param4.nil? == false and @param4 != ''
       @course = @course.where("course_type like '#{@param4}'")
-        end
+    end
     if @param5.nil? == false and @param5 != ''
      @course = @course.where("exam_type like '#{@param5}'")
     end
@@ -113,11 +125,11 @@ end
      current_user.courses.delete(@course)
      flash={:success => "成功退选课程: #{@course.name}"} 
      redirect_to courses_path, flash: flash 
-   end 
+  end 
     current_user.courses.delete(@course)
     flash={:success => "成功退选课程: #{@course.name}"}
     redirect_to courses_path, flash: flash
-  end
+end
 
  def filter
     redirect_to list_courses_path(params)
@@ -157,6 +169,3 @@ end
     params.require(:course).permit(:course_code, :name, :course_type, :teaching_type, :exam_type,
                                    :credit, :limit_num, :class_room, :course_time, :course_week)
   end
-
-
-end
