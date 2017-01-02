@@ -58,6 +58,7 @@ ActiveRecord::Schema.define(version: 20161123101856) do
     t.boolean  "teacher",         default: false
     t.datetime "created_at",                      null: false
     t.datetime "updated_at",                      null: false
+    t.boolean  "open" 
   end
 
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree

@@ -44,11 +44,28 @@ class CoursesController < ApplicationController
   end
 
   #-------------------------for students----------------------
+def open  
+    @course = Course.find_by_id(params[:id]) 
+    @course.update_attributes(:open=>true) 
+    redirect_to courses_path, flash: {:success => "已经成功开放该课程:#{ @course.name}"} 
+end  
+
+def close 
+  @course = Course.find_by_id(params[:id]) 
+  @course.update_attributes(:open=>false)  
+  redirect_to courses_path, flash: {:success => "已经成功关闭该课程:#{ @course.name}"}  
+end 
 
   def list
      #   按照关键词（课程名称、教师名）或者下拉列表进行查询
     @course = Course.all
-
+    @course_true=Array.new 
+    @course.each do |every_course| 
+      if every_course.open_close then 
+         @course_true.push every_course 
+      end 
+    end  
+    @course=@course_true 
     @param1 =  params[:queryKeyword_1]   #课程名
     @param2= params[:queryKeyword_2]  #department
     @param3= params[:queryKeyword_3] #credit/hour
@@ -92,7 +109,11 @@ class CoursesController < ApplicationController
   end
 
   def quit
-    @course=Course.find_by(params[:id])
+    @course=Course.find_by_id(params[:id])
+     current_user.courses.delete(@course)
+     flash={:success => "成功退选课程: #{@course.name}"} 
+     redirect_to courses_path, flash: flash 
+   end 
     current_user.courses.delete(@course)
     flash={:success => "成功退选课程: #{@course.name}"}
     redirect_to courses_path, flash: flash
