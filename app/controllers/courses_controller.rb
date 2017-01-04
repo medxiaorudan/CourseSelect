@@ -69,15 +69,6 @@ end
   def list
      #   按照关键词（课程名称、教师名）或者下拉列表进行查询
     @course=Course.all
-    @course=@course-current_user.courses
-    @course_true=Array.new
-    @course.each do |every_course|
-      if every_course.open_close then
-         @course_true.push every_course
-      end
-    end 
-    @course=@course_true
-    @course=@course_true 
     @param1 =  params[:queryKeyword_1]   #课程名
     @param2= params[:queryKeyword_2]  #department
     @param3= params[:queryKeyword_3] #credit/hour
@@ -106,6 +97,7 @@ end
         @course_true.push single
       end
     end
+    @course=@course_true
   end
   
   def public_list 
@@ -126,10 +118,7 @@ end
      flash={:success => "成功退选课程: #{@course.name}"} 
      redirect_to courses_path, flash: flash 
   end 
-    current_user.courses.delete(@course)
-    flash={:success => "成功退选课程: #{@course.name}"}
-    redirect_to courses_path, flash: flash
-end
+  
 
  def filter
     redirect_to list_courses_path(params)
@@ -166,6 +155,6 @@ end
   end
 
   def course_params
-    params.require(:course).permit(:course_code, :name, :course_type, :teaching_type, :exam_type,
-                                   :credit, :limit_num, :class_room, :course_time, :course_week)
+    params.require(:course).permit(:course_code, :name, :course_type, :teaching_type, :exam_type, :credit, :limit_num, :class_room, :course_time, :course_week)
   end
+end
